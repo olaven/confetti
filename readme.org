@@ -1,4 +1,4 @@
-* Template for Clojurescript projects using Shadow CLJS
+* Fragments
 
 ** Local Development
 - starts automatically with cider jack in in Emacs
