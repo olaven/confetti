@@ -1,0 +1,10 @@
+* Template for Clojurescript projects using Shadow CLJS
+
+** Local Development
+- starts automatically with cider jack in in Emacs
+- runs on localhost:9630 
+- the app is running on localhost:8080
+
+** Deployment
+The Dockerfile is configured such that services like Railway.app will pick it up automatically. 
+
