@@ -32,6 +32,17 @@
       (g/as-polygon 50)
       (gl/as-gl-buffer-spec {:normals false :fixed-color []})))
 
+(defn draw-model
+  [model t]
+  (let [color (get-in model [:custom :color])
+        position (get-in model [:custom :position])]
+    (-> model
+        (update-in [:uniforms] merge
+                   {:model (-> M44
+                               (g/translate position)
+                               (g/rotate-z (-> t (* -1.1)))
+                               (g/rotate-y t))
+                    :color color}))))
 
 (defn ^:export main
   []
@@ -42,24 +53,27 @@
         gl        (gl/gl-context canvas)
         view-rect (gl/get-viewport-rect gl)
         shader    (sh/make-shader-from-spec gl (basic/make-shader-spec-2d false))
-        model     (-> (circle 0.1)
-                      (gl/make-buffers-in-spec gl glc/static-draw)
-                      (assoc-in [:uniforms :proj] (gl/ortho view-rect))
-                      (time)) ]
+        models     (for [_ (repeat 50 "")] (-> (circle 0.1)
+                                               (gl/make-buffers-in-spec gl glc/static-draw)
+                                               (assoc-in [:uniforms :proj] (gl/ortho view-rect))
+                                               (update-in [:attribs] dissoc :color)
+                                               (assoc :shader shader)
+                                ;; position is a concept added by me, not part of geom
+                                               (assoc-in [:custom :position] [(utils/float-between -1 1)
+                                                                              (utils/float-between -1 1)])
+
+                                               (assoc-in [:custom :color] [(utils/float-between .2 1)
+                                                                           (utils/float-between .2 1)
+                                                                           (utils/float-between .2 1)
+                                                                           (utils/float-between .2 1)])))]
+
     (anim/animate
      (fn [t frame]
        (gl/set-viewport gl view-rect)
        (gl/clear-color-and-depth-buffer gl 1 0.98 0.95 1 1)
-       ;; draw left polygon using color uniform (that's why we need to remove color attrib)
-       (gl/draw-with-shader
-        gl (-> model
-               (assoc :shader  shader)
-               (update-in [:attribs] dissoc :color)
-               (update-in [:uniforms] merge
-                          {:model (-> M44
-                                      (g/rotate-x (-> t
-                                                      (* -1.2)))
-                                      (g/rotate-y t)) ;; keep g/translate with vec call in mind 
-                           :color [1 0 1 1]})))
+       (doseq [model models]
+         (gl/draw-with-shader
+          gl
+          (-> model (draw-model t))))
        true))))
 

@@ -12,3 +12,11 @@
     (set! canvas.width width)
     (set! canvas.height height))
   canvas)
+
+(defn print!
+  [value]
+  (println value)
+  value)
+
+(defn float-between [a b]
+  (print! (+ a (* (rand) (- b a)))))
