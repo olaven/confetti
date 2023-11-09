@@ -1,0 +1,24 @@
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
+#main {
+  width: 100%;
+  height: 100vh;
+}
+
+#birthday-message {
+  position: absolute;
+  bottom: 10px; /* Adjust the distance from the bottom as needed */
+  left: 10px; /* Adjust the distance from the bottom as needed */
+  text-align: center;
+  width: 25%;
+  font-size: 2em;
+  background-color: #1e4363; /* Dark blue color */
+  color: #fff; /* White text color for contrast */
+}
