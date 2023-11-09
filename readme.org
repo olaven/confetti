@@ -1,4 +1,4 @@
-* Fragments
+* Confetti
 
 ** Local Development
 - starts automatically with cider jack in in Emacs
