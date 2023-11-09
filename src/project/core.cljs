@@ -35,13 +35,15 @@
 (defn draw-model
   [model t]
   (let [color (get-in model [:custom :color])
-        position (get-in model [:custom :position])]
+        position (get-in model [:custom :position])
+        variation (get-in model [:custom :variation])]
     (-> model
         (update-in [:uniforms] merge
                    {:model (-> M44
                                (g/translate position)
-                               (g/rotate-z (-> t (* -1.1)))
-                               (g/rotate-y t))
+                               (g/rotate-z (-> variation (* 5.2)))
+                               (g/rotate-y (-> variation (* t))))
+                    ;; should use t to generate a random color sequence somehow 
                     :color color}))))
 
 (defn ^:export main
@@ -53,19 +55,20 @@
         gl        (gl/gl-context canvas)
         view-rect (gl/get-viewport-rect gl)
         shader    (sh/make-shader-from-spec gl (basic/make-shader-spec-2d false))
-        models     (for [_ (repeat 50 "")] (-> (circle 0.1)
+        models     (for [_ (repeat 120 "")] (-> (circle 0.1)
                                                (gl/make-buffers-in-spec gl glc/static-draw)
                                                (assoc-in [:uniforms :proj] (gl/ortho view-rect))
                                                (update-in [:attribs] dissoc :color)
                                                (assoc :shader shader)
-                                ;; position is a concept added by me, not part of geom
-                                               (assoc-in [:custom :position] [(utils/float-between -1 1)
+                                               ;; position is a concept added by me, not part of geom
+                                               (assoc-in [:custom :variation] (utils/float-between 2 5))
+                                               (assoc-in [:custom :position] [(utils/float-between -2 2)
                                                                               (utils/float-between -1 1)])
 
-                                               (assoc-in [:custom :color] [(utils/float-between .2 1)
-                                                                           (utils/float-between .2 1)
-                                                                           (utils/float-between .2 1)
-                                                                           (utils/float-between .2 1)])))]
+                                               (assoc-in [:custom :color] [(utils/float-between 0.4 1)
+                                                                           (utils/float-between 0.2 1)
+                                                                           (utils/float-between 0.4 2)
+                                                                           (utils/float-between 0.6 2)])))]
 
     (anim/animate
      (fn [t frame]
